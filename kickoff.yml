@@ -1,0 +1,17 @@
+project:
+  name: myawesomeproject
+  base_virtualhost:
+    local: my-awesome-project.local
+    staging: my-awesome-project.com
+    production: my-awesome-project.com
+
+mysql:
+  user: kickoff
+  databases:
+    - my_awesome_database
+    - my_genious_database
+    - my_ok_database
+  enable_ports_mapping:
+    local: true
+    staging: true
+    production: true
