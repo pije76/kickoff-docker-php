@@ -4,17 +4,24 @@ services:
 
   proxy:
     image: traefik:1.3.2-alpine
-    container_name: kickoff_proxy
+    container_name: kickoff-proxy
     restart: unless-stopped
-    command: --web --docker --docker.domain=my-awesome-project.local --logLevel=DEBUG
+    command: --web --docker --logLevel=DEBUG
     networks:
       - proxy
     ports:
       - 80:80
-      - 8080:8080
+      - 443:443
+    labels:
+      {{- range $env, $virtualhost := .Values.Kickoff.project.base_virtualhost }}
+      {{- if eq  $env $.EnvFiles.Kickoff.ENV }}
+      - traefik.frontend.rule=Host:traefik.{{ $virtualhost }}
+      {{- end }}
+      {{- end }}
+      - traefik.port=8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /dev/null:/traefik.toml:ro
+      - ./traefik/traefik.toml:/traefik.toml:ro
 
 networks:
 

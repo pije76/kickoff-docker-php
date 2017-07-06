@@ -1,0 +1,11 @@
+version: '3.3'
+
+services:
+
+  openssl:
+    image: pgarrett/openssl-alpine
+    environment:
+      - PUBLIC_CN=*.{{ .Values.Kickoff.project.base_virtualhost.local }}
+      - PUBLIC_NAME={{ .Values.Kickoff.project.base_virtualhost.local }}
+    volumes:
+      - ./certs:/etc/ssl/certs:rw

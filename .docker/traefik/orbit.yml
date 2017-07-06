@@ -1,0 +1,8 @@
+commands:
+  - use: "openssl"
+    run:
+    {{- if eq "local" .EnvFiles.Kickoff.ENV }}
+      - docker-compose -f .docker/traefik/docker-compose-openssl.yml run openssl
+    {{- else }}
+      - echo Skipping fake certs generation
+    {{- end }}

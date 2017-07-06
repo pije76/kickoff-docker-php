@@ -1,0 +1,25 @@
+defaultEntryPoints = ["http", "https"]
+
+[web]
+address = ":8080"
+
+[entryPoints]
+
+[entryPoints.http]
+address = ":80"
+[entryPoints.http.redirect]
+entryPoint = "https"
+
+[entryPoints.https]
+address = ":443"
+[entryPoints.https.tls]
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+{{- range $env, $virtualhost := .Values.Kickoff.project.base_virtualhost }}
+{{- if eq  $env $.EnvFiles.Kickoff.ENV }}
+domain = "{{ $virtualhost }}"
+{{- end }}
+{{- end }}
+watch = true
+exposedbydefault = false

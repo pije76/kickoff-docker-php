@@ -1,7 +1,7 @@
 version: '3.3'
 
 services:
-
+{{- if .Values.Kickoff.mysql }}
   mysql:
     image: mysql:5.7
     container_name: local-{{ .Values.Kickoff.project.name }}-mysql
@@ -43,7 +43,7 @@ services:
       - PMA_USER=root
       - PMA_PASSWORD=admin
     labels:
-      - traefik.backend=phpmyadmin
+      - traefik.backend=local-{{ .Values.Kickoff.project.name }}-phpmyadmin
       {{- range $env, $virtualhost := .Values.Kickoff.project.base_virtualhost }}
       {{- if eq  $env $.EnvFiles.Kickoff.ENV }}
       - traefik.frontend.rule=Host:phpadmin.{{ $virtualhost }}
@@ -53,19 +53,20 @@ services:
     volumes:
       - ./phpmyadmin/volume:/sessions:rw
 {{ end }}
+{{- end }}
 secrets:
-
+{{ if .Values.Kickoff.mysql }}
   mysql_password:
     file: ./mysql/.secrets/mysql_password.txt
 
   mysql_root_password:
     file: ./mysql/.secrets/mysql_root_password.txt
-
+{{ end }}
 networks:
-
+{{ if .Values.Kickoff.mysql }}
   local_{{ .Values.Kickoff.project.name }}_mysql:
     driver: bridge
-
+{{ end }}
   proxy:
     external:
       name: kickoff_proxy
