@@ -8,13 +8,9 @@ services:
     restart: unless-stopped
     networks:
       - local_{{ .Values.Kickoff.project.name }}_mysql
-    {{- if .Values.Kickoff.mysql.enable_ports_mapping }}
-    {{- range $env, $enable := .Values.Kickoff.mysql.enable_ports_mapping }}
-    {{- if and (eq  $env $.EnvFiles.Kickoff.ENV) $enable }}
+    {{- if eq "true" .EnvFiles.Kickoff.MYSQL_ENABLE_PORTS_MAPPING }}
     ports:
-      - {{ $.EnvFiles.Kickoff.MYSQL_HOST_PORT_TO_MAP }}:3306
-    {{- end }}
-    {{- end }}
+      - {{ .EnvFiles.Kickoff.MYSQL_HOST_PORT_TO_MAP }}:3306
     {{- end }}
     environment:
       - MYSQL_USER={{ .Values.Kickoff.mysql.user }}

@@ -13,7 +13,11 @@ entryPoint = "https"
 [entryPoints.https]
 address = ":443"
 [entryPoints.https.tls]
-
+{{- if eq "local" .EnvFiles.Kickoff.ENV }}
+[[entryPoints.https.tls.certificates]]
+certFile = "tests/{{ .Values.Kickoff.project.base_virtualhost.local }}.crt"
+keyFile = "tests/{{ .Values.Kickoff.project.base_virtualhost.local }}.key"
+{{ end }}
 [docker]
 endpoint = "unix:///var/run/docker.sock"
 {{- range $env, $virtualhost := .Values.Kickoff.project.base_virtualhost }}

@@ -2,7 +2,8 @@ commands:
   - use: "openssl"
     run:
     {{- if eq "local" .EnvFiles.Kickoff.ENV }}
+      - orbit generate -t=.docker/traefik/docker-compose-openssl.blueprint.yml -o=.docker/traefik/docker-compose-openssl.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env
       - docker-compose -f .docker/traefik/docker-compose-openssl.yml run openssl
     {{- else }}
-      - echo Skipping fake certs generation
+      - echo Skipping unsigned certificates generation
     {{- end }}
