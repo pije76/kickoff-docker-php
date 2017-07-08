@@ -1,6 +1,6 @@
 project:
   name: myawesomeproject
-  base_virtualhost:
+  virtualhost:
     local: my-awesome-project.local
     staging: my-awesome-project.com
     production: my-awesome-project.com

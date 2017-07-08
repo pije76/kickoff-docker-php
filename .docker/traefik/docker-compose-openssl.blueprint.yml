@@ -11,7 +11,7 @@ services:
       - ORGANISATION=Kickoff
       - ISSUER_CN=Kickoff Ltd
       - ISSUER_NAME=kickoff
-      - PUBLIC_CN=*.{{ .Values.Kickoff.project.base_virtualhost.local }}
-      - PUBLIC_NAME={{ .Values.Kickoff.project.base_virtualhost.local }}
+      - PUBLIC_CN=*.{{ .Values.Kickoff.project.virtualhost.local }}
+      - PUBLIC_NAME={{ .Values.Kickoff.project.virtualhost.local }}
     volumes:
       - ./certs:/etc/ssl/certs:rw

@@ -40,7 +40,7 @@ services:
       - PMA_PASSWORD=admin
     labels:
       - traefik.backend=local-{{ .Values.Kickoff.project.name }}-phpmyadmin
-      {{- range $env, $virtualhost := .Values.Kickoff.project.base_virtualhost }}
+      {{- range $env, $virtualhost := .Values.Kickoff.project.virtualhost }}
       {{- if eq  $env $.EnvFiles.Kickoff.ENV }}
       - traefik.frontend.rule=Host:phpadmin.{{ $virtualhost }}
       {{- end }}

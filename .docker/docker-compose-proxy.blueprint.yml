@@ -3,7 +3,7 @@ version: '3.3'
 services:
 
   proxy:
-    image: traefik:1.3.2-alpine
+    image: traefik:1.3.3-alpine
     container_name: kickoff-proxy
     restart: unless-stopped
     command: --web --docker --logLevel=DEBUG
@@ -13,7 +13,7 @@ services:
       - 80:80
       - 443:443
     labels:
-      {{- range $env, $virtualhost := .Values.Kickoff.project.base_virtualhost }}
+      {{- range $env, $virtualhost := .Values.Kickoff.project.virtualhost }}
       {{- if eq $env $.EnvFiles.Kickoff.ENV }}
       - traefik.frontend.rule=Host:traefik.{{ $virtualhost }}
       {{- end }}
