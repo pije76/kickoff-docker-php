@@ -4,10 +4,17 @@ commands:
       - orbit generate -t=.docker/mysql/.secrets/mysql_password.blueprint.txt -o=.docker/mysql/.secrets/mysql_password.txt -e=Kickoff,.env
       - orbit generate -t=.docker/mysql/.secrets/mysql_root_password.blueprint.txt -o=.docker/mysql/.secrets/mysql_root_password.txt -e=Kickoff,.env
       - orbit generate -t=.docker/mysql/docker-entrypoint-initdb.d/databases.blueprint.sql -o=.docker/mysql/docker-entrypoint-initdb.d/databases.sql -v=Kickoff,kickoff.yml
+      - orbit generate -t=.docker/php-fpm/php-fpm.d/security.blueprint.conf -o=.docker/php-fpm/php-fpm.d/security.conf -e=Kickoff,.env
       - orbit run openssl -c=.docker/traefik/orbit.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env -s
       - orbit generate -t=.docker/traefik/traefik.blueprint.toml -o=.docker/traefik/traefik.toml -v=Kickoff,kickoff.yml -e=Kickoff,.env
       - orbit generate -t=.docker/docker-compose.blueprint.yml -o=.docker/docker-compose.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env
+      {{- if eq "linux" .Os }}
+      - sh .docker/php-fpm/.bin/usermod.sh
+      {{- end }}
       - orbit generate -t=.docker/docker-compose-proxy.blueprint.yml -o=.docker/docker-compose-proxy.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env
+  - use: "build"
+    run:
+      - docker-compose -f .docker/docker-compose.yml build
   - use: "proxy-up"
     run:
       - docker-compose -p kickoff -f .docker/docker-compose-proxy.yml up -d
@@ -22,4 +29,4 @@ commands:
       - docker-compose -f .docker/docker-compose.yml down
   - use: "kickoff"
     run:
-      - orbit run down generate proxy-up up -s
+      - orbit run down generate build proxy-up up -s

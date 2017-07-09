@@ -1,0 +1,5 @@
+FROM nginx:1.12-alpine
+
+ARG UID=1000
+RUN adduser -D -u $UID www-data &&\
+    rm /etc/nginx/conf.d/default.conf

@@ -1,13 +1,57 @@
 version: '3.3'
 
 services:
-{{- if .Values.Kickoff.mysql }}
+
+  nginx:
+    build:
+      context: ./nginx
+      args:
+        - UID={{ if eq "linux" .Os }}${UID}{{ else }}1000{{ end }}
+    container_name: {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-nginx
+    restart: unless-stopped
+    entrypoint: /usr/local/bin/docker-entrypoint.sh
+    depends_on:
+      - php-fpm
+    labels:
+      - traefik.backend={{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-nginx
+      {{- range $env, $virtualhost := .Values.Kickoff.project.virtualhost }}
+      {{- if eq  $env $.EnvFiles.Kickoff.ENV }}
+      - traefik.frontend.rule=Host:www.{{ $virtualhost }}
+      {{- end }}
+      {{- end }}
+      - traefik.docker.network=kickoff_proxy
+    networks:
+      - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_nginx
+      - proxy
+    volumes:
+      - ../app:/var/www/html:ro
+      - ./nginx/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh:ro
+      - ./nginx/conf.d/php-fpm.conf:/etc/nginx/conf.d/php-fpm.conf:ro
+
+  php-fpm:
+    build: ./php-fpm
+    container_name: {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-php-fpm
+    restart: unless-stopped
+    entrypoint: /usr/local/bin/docker-entrypoint.sh
+    networks:
+      - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_nginx
+      - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_mysql
+    environment:
+      - UID={{ if eq "linux" .Os }}${UID}{{ else }}1000{{ end }}
+    labels:
+      - traefik.enable=false
+    volumes:
+      - ../app:/var/www/html:rw
+      - ./php-fpm/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh:ro
+      - ./php-fpm/php-fpm.d/security.conf:/usr/{{ .EnvFiles.Kickoff.ENV }}/etc/php-fpm.d/security.conf:ro
+      - ./php-fpm/php-fpm.d/uploads.conf:/usr/{{ .EnvFiles.Kickoff.ENV }}/etc/php-fpm.d/uploads.conf:ro
+{{ if .Values.Kickoff.mysql }}
   mysql:
     image: mysql:5.7
-    container_name: local-{{ .Values.Kickoff.project.name }}-mysql
+    container_name: {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-mysql
     restart: unless-stopped
     networks:
-      - local_{{ .Values.Kickoff.project.name }}_mysql
+      - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_mysql
     {{- if eq "true" .EnvFiles.Kickoff.MYSQL_ENABLE_PORTS_MAPPING }}
     ports:
       - {{ .EnvFiles.Kickoff.MYSQL_HOST_PORT_TO_MAP }}:3306
@@ -29,17 +73,17 @@ services:
 {{ if eq "local" .EnvFiles.Kickoff.ENV }}
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:4.7
-    container_name: local-{{ .Values.Kickoff.project.name }}-phpmyadmin
+    container_name: {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-phpmyadmin
     restart: unless-stopped
     networks:
-        - local_{{ .Values.Kickoff.project.name }}_mysql
+        - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_mysql
         - proxy
     environment:
       - PMA_HOST=mysql
       - PMA_USER=root
       - PMA_PASSWORD=admin
     labels:
-      - traefik.backend=local-{{ .Values.Kickoff.project.name }}-phpmyadmin
+      - traefik.backend={{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-phpmyadmin
       {{- range $env, $virtualhost := .Values.Kickoff.project.virtualhost }}
       {{- if eq  $env $.EnvFiles.Kickoff.ENV }}
       - traefik.frontend.rule=Host:phpadmin.{{ $virtualhost }}
@@ -59,8 +103,11 @@ secrets:
     file: ./mysql/.secrets/mysql_root_password.txt
 {{ end }}
 networks:
+
+  {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_nginx:
+    driver: bridge
 {{ if .Values.Kickoff.mysql }}
-  local_{{ .Values.Kickoff.project.name }}_mysql:
+  {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_mysql:
     driver: bridge
 {{ end }}
   proxy:
