@@ -29,4 +29,4 @@ commands:
       - docker-compose -f .docker/docker-compose.yml down
   - use: "kickoff"
     run:
-      - orbit run down generate build proxy-up up -s
+      - orbit run down generate build up -s
