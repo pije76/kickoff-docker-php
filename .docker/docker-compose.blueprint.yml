@@ -10,8 +10,6 @@ services:
     container_name: {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-nginx
     restart: unless-stopped
     entrypoint: /usr/local/bin/docker-entrypoint.sh
-    depends_on:
-      - php-fpm
     labels:
       - traefik.backend={{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-nginx
       {{- range $env, $virtualhost := .Values.Kickoff.project.virtualhost }}
@@ -45,7 +43,7 @@ services:
       - ./php-fpm/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh:ro
       - ./php-fpm/php-fpm.d/security.conf:/usr/{{ .EnvFiles.Kickoff.ENV }}/etc/php-fpm.d/security.conf:ro
       - ./php-fpm/php-fpm.d/uploads.conf:/usr/{{ .EnvFiles.Kickoff.ENV }}/etc/php-fpm.d/uploads.conf:ro
-{{ if .Values.Kickoff.mysql }}
+
   mysql:
     image: mysql:5.7
     container_name: {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-mysql
@@ -81,7 +79,7 @@ services:
     environment:
       - PMA_HOST=mysql
       - PMA_USER=root
-      - PMA_PASSWORD=admin
+      - PMA_PASSWORD={{ .EnvFiles.Kickoff.MYSQL_ROOT_PASSWORD }}
     labels:
       - traefik.backend={{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-phpmyadmin
       {{- range $env, $virtualhost := .Values.Kickoff.project.virtualhost }}
@@ -93,23 +91,22 @@ services:
     volumes:
       - ./phpmyadmin/volume:/sessions:rw
 {{ end }}
-{{- end }}
 secrets:
-{{ if .Values.Kickoff.mysql }}
+
   mysql_password:
     file: ./mysql/.secrets/mysql_password.txt
 
   mysql_root_password:
     file: ./mysql/.secrets/mysql_root_password.txt
-{{ end }}
+
 networks:
 
   {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_nginx:
     driver: bridge
-{{ if .Values.Kickoff.mysql }}
+
   {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_mysql:
     driver: bridge
-{{ end }}
+
   proxy:
     external:
       name: kickoff_proxy
