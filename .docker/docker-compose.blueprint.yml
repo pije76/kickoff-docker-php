@@ -35,7 +35,7 @@ services:
       {{- end }}
       - traefik.docker.network=kickoff_proxy
     networks:
-      - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_nginx
+      - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_php_fpm
       - proxy
     volumes:
       - ../app:/var/www/html:ro
@@ -48,8 +48,9 @@ services:
     restart: unless-stopped
     entrypoint: /usr/local/bin/docker-entrypoint.sh
     networks:
-      - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_nginx
+      - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_php_fpm
       - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_mysql
+      - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_redis
     environment:
       - UID={{ if eq "linux" .Os }}${UID}{{ else }}1000{{ end }}
     labels:
@@ -109,6 +110,19 @@ services:
       - ./phpmyadmin/volume:/sessions:rw
 {{ end }}
 
+  redis:
+    image: redis:3.2-alpine
+    container_name: {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-redis
+    restart: unless-stopped
+    command: redis-server --requirepass {{ .EnvFiles.Kickoff.REDIS_PASSWORD }}
+    networks:
+      - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_redis
+    labels:
+      - traefik.enable=false
+    volumes:
+      - ./redis/voume:/data:rw
+
+
 secrets:
 
 
@@ -123,11 +137,15 @@ secrets:
 networks:
 
 
-  {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_nginx:
+  {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_php_fpm:
     driver: bridge
 
 
   {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_mysql:
+    driver: bridge
+
+
+  {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_redis:
     driver: bridge
 
 
