@@ -1,6 +1,8 @@
 version: '3.3'
 
+
 services:
+
 
   nginx:
     build:
@@ -26,6 +28,7 @@ services:
       - ./nginx/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh:ro
       - ./nginx/conf.d/php-fpm.conf:/etc/nginx/conf.d/php-fpm.conf:ro
 
+
   php-fpm:
     build: ./php-fpm
     container_name: {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-php-fpm
@@ -43,6 +46,7 @@ services:
       - ./php-fpm/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh:ro
       - ./php-fpm/php-fpm.d/security.conf:/usr/{{ .EnvFiles.Kickoff.ENV }}/etc/php-fpm.d/security.conf:ro
       - ./php-fpm/php-fpm.d/uploads.conf:/usr/{{ .EnvFiles.Kickoff.ENV }}/etc/php-fpm.d/uploads.conf:ro
+
 
   mysql:
     image: mysql:5.7
@@ -68,6 +72,7 @@ services:
       - ./mysql/conf.d/custom.cnf:/etc/mysql/conf.d/custom.cnf:ro
       - ./mysql/conf.d/utf8mb4.cnf:/etc/mysql/conf.d/utf8mb4.cnf:ro
       - ./mysql/docker-entrypoint-initdb.d/databases.sql:/docker-entrypoint-initdb.d/databases.sql:ro
+
 {{ if eq "local" .EnvFiles.Kickoff.ENV }}
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:4.7
@@ -91,21 +96,28 @@ services:
     volumes:
       - ./phpmyadmin/volume:/sessions:rw
 {{ end }}
+
 secrets:
+
 
   mysql_password:
     file: ./mysql/.secrets/mysql_password.txt
 
+
   mysql_root_password:
     file: ./mysql/.secrets/mysql_root_password.txt
 
+
 networks:
+
 
   {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_nginx:
     driver: bridge
 
+
   {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_mysql:
     driver: bridge
+
 
   proxy:
     external:
