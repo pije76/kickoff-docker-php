@@ -14,4 +14,4 @@ services:
       - PUBLIC_CN=*.{{ .Values.Kickoff.project.virtualhost.local }}
       - PUBLIC_NAME={{ .Values.Kickoff.project.virtualhost.local }}
     volumes:
-      - ./certs:/etc/ssl/certs:rw
+      - ../traefik/certs:/etc/ssl/certs:rw

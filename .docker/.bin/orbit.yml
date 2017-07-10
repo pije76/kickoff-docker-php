@@ -1,0 +1,9 @@
+commands:
+  - use: "openssl"
+    run:
+    {{- if eq "local" .EnvFiles.Kickoff.ENV }}
+      - orbit generate -t=.docker/.bin/docker-compose-openssl.blueprint.yml -o=.docker/.bin/docker-compose-openssl.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env
+      - docker-compose -f .docker/.bin/docker-compose-openssl.yml run openssl
+    {{- else }}
+      - echo Skipping unsigned certificates generation
+    {{- end }}

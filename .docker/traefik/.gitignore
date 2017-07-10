@@ -1,3 +1,2 @@
 certs
-docker-compose-openssl.yml
 traefik.toml
