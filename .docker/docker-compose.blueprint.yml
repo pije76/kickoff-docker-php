@@ -69,7 +69,6 @@ services:
       - traefik.enable=false
     volumes:
       - ./mysql/volume:/var/lib/mysql:rw
-      - ./mysql/conf.d/custom.cnf:/etc/mysql/conf.d/custom.cnf:ro
       - ./mysql/conf.d/utf8mb4.cnf:/etc/mysql/conf.d/utf8mb4.cnf:ro
       - ./mysql/docker-entrypoint-initdb.d/databases.sql:/docker-entrypoint-initdb.d/databases.sql:ro
 
