@@ -10,3 +10,6 @@ commands:
   - use: "toolbox"
     run:
       - docker exec --user www-data -ti {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-toolbox ash
+  - use: "mysql-cli"
+    run:
+      - docker exec -ti {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-mysql mysql -uroot -p{{ if eq "local" .EnvFiles.Kickoff.ENV }}{{ .EnvFiles.Kickoff.MYSQL_ROOT_PASSWORD }}{{ end }}
