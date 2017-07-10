@@ -7,3 +7,6 @@ commands:
     {{- else }}
       - echo Skipping unsigned certificates generation
     {{- end }}
+  - use: "toolbox"
+    run:
+      - docker exec --user www-data -ti {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-toolbox ash

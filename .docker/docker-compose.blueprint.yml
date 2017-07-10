@@ -4,6 +4,21 @@ version: '3.3'
 services:
 
 
+  toolbox:
+    build:
+      context: ./toolbox
+      args:
+        - UID={{ if eq "linux" .Os }}${UID}{{ else }}1000{{ end }}
+    container_name: {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-toolbox
+    restart: unless-stopped
+    tty: true
+    working_dir: /var/www/html
+    labels:
+      - traefik.enable=false
+    volumes:
+      - ../app:/var/www/html:rw
+
+
   nginx:
     build:
       context: ./nginx
@@ -11,7 +26,6 @@ services:
         - UID={{ if eq "linux" .Os }}${UID}{{ else }}1000{{ end }}
     container_name: {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-nginx
     restart: unless-stopped
-    entrypoint: /usr/local/bin/docker-entrypoint.sh
     labels:
       - traefik.backend={{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-nginx
       {{- range $env, $virtualhost := .Values.Kickoff.project.virtualhost }}
@@ -25,7 +39,6 @@ services:
       - proxy
     volumes:
       - ../app:/var/www/html:ro
-      - ./nginx/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh:ro
       - ./nginx/conf.d/php-fpm.conf:/etc/nginx/conf.d/php-fpm.conf:ro
 
 

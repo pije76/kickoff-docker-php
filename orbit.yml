@@ -1,4 +1,7 @@
 commands:
+  - use: "toolbox"
+    run:
+      - orbit run toolbox -c=.docker/.bin/orbit.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env -s
   - use: "generate"
     run:
       - orbit generate -t=.docker/mysql/.secrets/mysql_password.blueprint.txt -o=.docker/mysql/.secrets/mysql_password.txt -e=Kickoff,.env
