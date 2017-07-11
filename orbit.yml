@@ -7,6 +7,7 @@
 # |
 # | Good to know: in order to run the following commands, you have to be in
 # | same folder as this file.
+# |
 
 commands:
 
@@ -15,6 +16,7 @@ commands:
 # |--------------------------------------------------------------------------
 # |
 # | Connects through ash to the toolbox container.
+# |
 
   - use: "toolbox"
     run:
@@ -26,6 +28,7 @@ commands:
 # |
 # | Opens the MySQL cli.
 # | On environments <> "local", it will ask you the MySQL root password.
+# |
 
   - use: "mysql-cli"
     run:
@@ -43,6 +46,7 @@ commands:
 # | If you're using a Linux operating system, it also set the UID of
 # | www-data user from toolbox, NGINX and PHP-FPM containers with the UID
 # | of your current user to avoid permissions issues.
+# |
 
   - use: "generate"
     run:
@@ -64,6 +68,7 @@ commands:
 # |--------------------------------------------------------------------------
 # |
 # | Builds the toolbox, NGINX and PHP-FPM containers.
+# |
 
   - use: "build"
     run:
@@ -74,6 +79,7 @@ commands:
 # |--------------------------------------------------------------------------
 # |
 # | Starts the traefik (reverse-proxy) container.
+# |
 
   - use: "proxy-up"
     run:
@@ -87,6 +93,7 @@ commands:
 # |
 # | If you have started your containers with "up" commands,
 # | make sure you have run "down" before running "proxy-down"!
+# |
 
   - use: "proxy-down"
     run:
@@ -100,6 +107,7 @@ commands:
 # | On "local" environment, also starts the phpMyAdmin container.
 # |
 # | Make sure you have start the traefik container before running it!
+# |
 
   - use: "up"
     run:
@@ -111,6 +119,7 @@ commands:
 # |
 # | Stops the toolbox, NGINX, PHP-FPM, MySQL and Redis containers.
 # | On "local" environment, also stops the phpMyAdmin container.
+# |
 
   - use: "down"
     run:
@@ -121,6 +130,7 @@ commands:
 # |--------------------------------------------------------------------------
 # |
 # | Combo of "down", "generate", "build" and "up" commands.
+# |
 
   - use: "kickoff"
     run:
