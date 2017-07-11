@@ -40,7 +40,7 @@ commands:
 # |
 # | Creates or updates all the files from blueprints.
 # |
-# | On "local" environment, it generates a self-signed certificate to
+# | On "local" environment, it generates the self-signed certificates to
 # | enable HTTPS.
 # |
 # | If you're using a Linux operating system, it also set the UID of
