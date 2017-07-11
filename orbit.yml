@@ -25,8 +25,7 @@ commands:
 # |--------------------------------------------------------------------------
 # |
 # | Opens the MySQL cli.
-# | On environments <> "local", it will ask you the MySQL root
-# | password.
+# | On environments <> "local", it will ask you the MySQL root password.
 
   - use: "mysql-cli"
     run:
