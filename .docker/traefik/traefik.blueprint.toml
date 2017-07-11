@@ -19,11 +19,6 @@ certFile = "tests/{{ .Values.Kickoff.project.virtualhost.local }}.crt"
 keyFile = "tests/{{ .Values.Kickoff.project.virtualhost.local }}.key"
 {{ end }}
 
-# File backend
-[file]
-watch = true
-
-
 # API backend
 [web]
 address = ":8080"

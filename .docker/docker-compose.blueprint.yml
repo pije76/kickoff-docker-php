@@ -30,7 +30,7 @@ services:
       - traefik.backend={{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-nginx
       {{- range $env, $virtualhost := .Values.Kickoff.project.virtualhost }}
       {{- if eq  $env $.EnvFiles.Kickoff.ENV }}
-      - traefik.frontend.rule=Host:www.{{ $virtualhost }}
+      - traefik.frontend.rule=Host:{{ $virtualhost }},www.{{ $virtualhost }}
       {{- end }}
       {{- end }}
       - traefik.docker.network=kickoff_proxy
