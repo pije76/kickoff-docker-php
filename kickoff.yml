@@ -34,7 +34,7 @@ project:
 # |
 # | Last but not least, on your "local" environment, it will be used to
 # | generate the self-signed certificates. So if you need to update the virtual host,
-# | delete the ".docker/traefik/certs" folder and run "orbit run generate".
+# | delete the ".docker/traefik/certs" folder and run "orbit run kickoff".
 # |
 
   virtualhost:
