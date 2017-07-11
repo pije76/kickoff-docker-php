@@ -1,3 +1,9 @@
+# |--------------------------------------------------------------------------
+# | PHP-FPM
+# |--------------------------------------------------------------------------
+# |
+# | TODO
+
 FROM php:7.1-fpm-alpine
 
 RUN apk update &&\
@@ -9,6 +15,12 @@ RUN apk update &&\
     docker-php-ext-install pdo_mysql &&\
     rm -rf /var/cache/apk/*
 
+# |--------------------------------------------------------------------------
+# | Redis
+# |--------------------------------------------------------------------------
+# |
+# | TODO
+
 ENV PHPREDIS_VERSION 3.1.2
 
 RUN mkdir -p /usr/src/php/ext/redis &&\
@@ -17,8 +29,14 @@ RUN mkdir -p /usr/src/php/ext/redis &&\
     docker-php-ext-install redis &&\
     { \
         echo 'session.save_handler = redis'; \
-        echo 'session.save_path = tcp://redis:6379'; \
+        echo 'session.save_path = tcp://redis:6379?auth={{ .EnvFiles.Kickoff.REDIS_PASSWORD }}'; \
     } >> /usr/local/etc/php/conf.d/docker-php-ext-redis.ini
+
+# |--------------------------------------------------------------------------
+# | Xdebug
+# |--------------------------------------------------------------------------
+# |
+# | TODO
 
 {{ if eq "local" .EnvFiles.Kickoff.ENV }}
 ENV XDEBUG_VERSION XDEBUG_2_5_5
@@ -35,6 +53,12 @@ RUN mkdir -p /usr/src/php/ext/xdebug &&\
         echo 'xdebug.remote_connect_back=0'; \
     } >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 {{ end }}
+
+# |--------------------------------------------------------------------------
+# | Misc
+# |--------------------------------------------------------------------------
+# |
+# | TODO
 
 RUN echo http://dl-2.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories &&\
     apk --no-cache add shadow

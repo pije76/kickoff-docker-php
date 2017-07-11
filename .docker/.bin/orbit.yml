@@ -1,3 +1,9 @@
+# |--------------------------------------------------------------------------
+# | Orbit commands
+# |--------------------------------------------------------------------------
+# |
+# | TODO
+
 commands:
   - use: "openssl"
     run:
@@ -5,7 +11,7 @@ commands:
       - orbit generate -t=.docker/.bin/docker-compose-openssl.blueprint.yml -o=.docker/.bin/docker-compose-openssl.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env
       - docker-compose -f .docker/.bin/docker-compose-openssl.yml run openssl
     {{- else }}
-      - echo Skipping unsigned certificates generation
+      - echo Skipping self-signed certificates generation
     {{- end }}
   - use: "toolbox"
     run:
