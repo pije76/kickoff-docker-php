@@ -1,9 +1,3 @@
-# |--------------------------------------------------------------------------
-# | Proxy blueprint
-# |--------------------------------------------------------------------------
-# |
-# | TODO
-
 version: '3.3'
 
 
@@ -14,7 +8,7 @@ services:
     image: traefik:1.3.3-alpine
     container_name: kickoff-proxy
     restart: unless-stopped
-    command: --web --docker --logLevel={{ if eq "true" .EnvFiles.Kickoff.DEBUG }}DEBUG{{ else }}ERROR{{ end }}
+    command: --web --docker
     networks:
       - proxy
     ports:

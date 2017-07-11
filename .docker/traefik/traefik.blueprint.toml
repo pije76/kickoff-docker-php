@@ -1,27 +1,17 @@
-# |--------------------------------------------------------------------------
-# | Traefik configuration file
-# |--------------------------------------------------------------------------
-# |
-# | TODO
+# Main section
+logLevel = {{ if eq "true" .EnvFiles.Kickoff.DEBUG }}"DEBUG"{{ else }}"ERROR"{{ end }}
 
+
+# Entry points definition
 defaultEntryPoints = ["http", "https"]
 
-
-[web]
-address = ":8080"
-
-
 [entryPoints]
-
 [entryPoints.http]
 address = ":80"
-
 [entryPoints.http.redirect]
 entryPoint = "https"
-
 [entryPoints.https]
 address = ":443"
-
 [entryPoints.https.tls]
 {{- if eq "local" .EnvFiles.Kickoff.ENV }}
 [[entryPoints.https.tls.certificates]]
@@ -29,6 +19,17 @@ certFile = "tests/{{ .Values.Kickoff.project.virtualhost.local }}.crt"
 keyFile = "tests/{{ .Values.Kickoff.project.virtualhost.local }}.key"
 {{ end }}
 
+# File backend
+[file]
+watch = true
+
+
+# API backend
+[web]
+address = ":8080"
+
+
+# Docker backend
 [docker]
 endpoint = "unix:///var/run/docker.sock"
 {{- range $env, $virtualhost := .Values.Kickoff.project.virtualhost }}
