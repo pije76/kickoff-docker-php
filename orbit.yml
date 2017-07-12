@@ -10,127 +10,171 @@
 
 commands:
 
-# |--------------------------------------------------------------------------
-# | orbit run toolbox
-# |--------------------------------------------------------------------------
-# |
-# | Connects through ash to the toolbox container.
-# |
+  # |--------------------------------------------------------------------------
+  # | orbit run toolbox-build
+  # |--------------------------------------------------------------------------
+  # |
+  # | Generates the toolbox docker-compose file and builds the toolbox container.
+  # |
+
+  - use: "toolbox-build"
+    run:
+      - orbit generate -t=.docker/docker-compose-toolbox.blueprint.yml -o=.docker/docker-compose-toolbox.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env
+      {{- if eq "linux" .Os }}
+      - sh .docker/.bin/usermod.sh
+      {{- end }}
+      - docker-compose -f .docker/docker-compose-toolbox.yml build
+
+  # |--------------------------------------------------------------------------
+  # | orbit run toolbox-up
+  # |--------------------------------------------------------------------------
+  # |
+  # | Starts the tooblox container.
+  # | On "local" environment, also generates the self-signed certificate.
+  # |
+
+  - use: "toolbox-up"
+    run:
+      - docker-compose -f .docker/docker-compose-toolbox.yml up -d
+      - orbit run openssl-self-signed-certificate -c=.docker/.bin/orbit.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env -s
+      - orbit run openssl-htdigest -c=.docker/.bin/orbit.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env -s
+
+  # |--------------------------------------------------------------------------
+  # | orbit run toolbox-down
+  # |--------------------------------------------------------------------------
+  # |
+  # | Stops the toolbox container.
+  # |
+
+  - use: "toolbox-down"
+    run:
+      - docker-compose -f .docker/docker-compose-toolbox.yml down
+
+  # |--------------------------------------------------------------------------
+  # | orbit run toolbox
+  # |--------------------------------------------------------------------------
+  # |
+  # | Connects through ash to the toolbox container.
+  # |
 
   - use: "toolbox"
     run:
-      - orbit run toolbox -c=.docker/.bin/orbit.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env -s
+      - orbit run toolbox-ash -c=.docker/.bin/orbit.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env -s
 
-# |--------------------------------------------------------------------------
-# | orbit run mysql-cli
-# |--------------------------------------------------------------------------
-# |
-# | Opens the MySQL cli.
-# | On environments <> "local", it will ask you the MySQL root password.
-# |
+  # |--------------------------------------------------------------------------
+  # | orbit run proxy-build
+  # |--------------------------------------------------------------------------
+  # |
+  # | Generates the configuration and docker-compose files for Traefik.
+  # |
 
-  - use: "mysql-cli"
+  - use: "proxy-build"
     run:
-      - orbit run mysql-cli -c=.docker/.bin/orbit.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env -s
+      - orbit generate -t=.docker/traefik/traefik.blueprint.toml -o=.docker/traefik/traefik.toml -v=Kickoff,kickoff.yml -e=Kickoff,.env
+      - orbit generate -t=.docker/docker-compose-proxy.blueprint.yml -o=.docker/docker-compose-proxy.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env
 
-# |--------------------------------------------------------------------------
-# | orbit run generate
-# |--------------------------------------------------------------------------
-# |
-# | Creates or updates all the files from blueprints.
-# |
-# | On "local" environment, it generates the self-signed certificates to
-# | enable HTTPS.
-# |
-# | If you're using a Linux operating system, it also set the UID of
-# | www-data user from toolbox, NGINX and PHP-FPM containers with the UID
-# | of your current user to avoid permissions issues.
-# |
+  # |--------------------------------------------------------------------------
+  # | orbit run proxy-up
+  # |--------------------------------------------------------------------------
+  # |
+  # | Starts the Traefik container.
+  # |
 
-  - use: "generate"
+  - use: "proxy-up"
+    run:
+      - docker-compose -p kickoff -f .docker/docker-compose-proxy.yml up -d
+
+  # |--------------------------------------------------------------------------
+  # | orbit run proxy-down
+  # |--------------------------------------------------------------------------
+  # |
+  # | Stops the Traefik container.
+  # |
+  # | If your others containers are still running, make sure you have run "down".
+  # |
+
+  - use: "proxy-down"
+    run:
+      - docker-compose -p kickoff -f .docker/docker-compose-proxy.yml down
+
+  # |--------------------------------------------------------------------------
+  # | orbit run build
+  # |--------------------------------------------------------------------------
+  # |
+  # | Generates all configuration files plus the main docker-compose file and
+  # | builds the NGINX and PHP-FPM containers.
+  # |
+
+  - use: "build"
     run:
       - orbit generate -t=.docker/mysql/.secrets/mysql_password.blueprint.txt -o=.docker/mysql/.secrets/mysql_password.txt -e=Kickoff,.env
       - orbit generate -t=.docker/mysql/.secrets/mysql_root_password.blueprint.txt -o=.docker/mysql/.secrets/mysql_root_password.txt -e=Kickoff,.env
       - orbit generate -t=.docker/mysql/docker-entrypoint-initdb.d/databases.blueprint.sql -o=.docker/mysql/docker-entrypoint-initdb.d/databases.sql -v=Kickoff,kickoff.yml
       - orbit generate -t=.docker/php-fpm/php-fpm.d/security.blueprint.conf -o=.docker/php-fpm/php-fpm.d/security.conf -e=Kickoff,.env
       - orbit generate -t=.docker/php-fpm/Dockerfile.blueprint -o=.docker/php-fpm/Dockerfile -e=Kickoff,.env
-      - orbit run openssl -c=.docker/.bin/orbit.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env -s
-      - orbit generate -t=.docker/traefik/traefik.blueprint.toml -o=.docker/traefik/traefik.toml -v=Kickoff,kickoff.yml -e=Kickoff,.env
       - orbit generate -t=.docker/docker-compose.blueprint.yml -o=.docker/docker-compose.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env
       {{- if eq "linux" .Os }}
       - sh .docker/.bin/usermod.sh
       {{- end }}
-      - orbit generate -t=.docker/docker-compose-proxy.blueprint.yml -o=.docker/docker-compose-proxy.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env
-
-# |--------------------------------------------------------------------------
-# | orbit run build
-# |--------------------------------------------------------------------------
-# |
-# | Builds the toolbox, NGINX and PHP-FPM containers.
-# |
-
-  - use: "build"
-    run:
       - docker-compose -f .docker/docker-compose.yml build
 
-# |--------------------------------------------------------------------------
-# | orbit run proxy-up
-# |--------------------------------------------------------------------------
-# |
-# | Starts the traefik (reverse-proxy) container.
-# |
-
-  - use: "proxy-up"
-    run:
-      - docker-compose -p kickoff -f .docker/docker-compose-proxy.yml up -d
-
-# |--------------------------------------------------------------------------
-# | orbit run proxy-down
-# |--------------------------------------------------------------------------
-# |
-# | Stops the traefik container.
-# |
-# | If you have started your containers with "up" commands,
-# | make sure you have run "down" before running "proxy-down"!
-# |
-
-  - use: "proxy-down"
-    run:
-      - docker-compose -p kickoff -f .docker/docker-compose-proxy.yml down
-
-# |--------------------------------------------------------------------------
-# | orbit run up
-# |--------------------------------------------------------------------------
-# |
-# | Starts the toolbox, NGINX, PHP-FPM, MySQL and Redis containers.
-# | On "local" environment, also starts the phpMyAdmin container.
-# |
-# | Make sure you have start the traefik container before running it!
-# |
+  # |--------------------------------------------------------------------------
+  # | orbit run up
+  # |--------------------------------------------------------------------------
+  # |
+  # | Starts the NGINX, PHP-FPM, MySQL and Redis containers.
+  # | On "local" environment, also starts the phpMyAdmin container.
+  # |
+  # | Make sure you have start the Traefik container before running it!
+  # |
 
   - use: "up"
     run:
       - docker-compose -f .docker/docker-compose.yml up -d
 
-# |--------------------------------------------------------------------------
-# | orbit run down
-# |--------------------------------------------------------------------------
-# |
-# | Stops the toolbox, NGINX, PHP-FPM, MySQL and Redis containers.
-# | On "local" environment, also stops the phpMyAdmin container.
-# |
+  # |--------------------------------------------------------------------------
+  # | orbit run down
+  # |--------------------------------------------------------------------------
+  # |
+  # | Stops the NGINX, PHP-FPM, MySQL and Redis containers.
+  # | On "local" environment, also stops the phpMyAdmin container.
+  # |
 
   - use: "down"
     run:
       - docker-compose -f .docker/docker-compose.yml down
 
-# |--------------------------------------------------------------------------
-# | orbit run kickoff
-# |--------------------------------------------------------------------------
-# |
-# | Combo of "down", "generate", "build" and "up" commands.
-# |
+  # |--------------------------------------------------------------------------
+  # | orbit run shutdown
+  # |--------------------------------------------------------------------------
+  # |
+  # | Stops all containers.
+  # |
+
+  - use: "shutdown"
+    run:
+      - orbit run down proxy-down toolbox-down -s
+
+  # |--------------------------------------------------------------------------
+  # | orbit run kickoff
+  # |--------------------------------------------------------------------------
+  # |
+  # | Starts all containers
+  # |
 
   - use: "kickoff"
     run:
-      - orbit run down generate build up -s
+      - orbit run toolbox-build proxy-build build toolbox-up proxy-up up -s
+      - orbit run rkt -c=.docker/.bin/orbit.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env -s
+
+  # |--------------------------------------------------------------------------
+  # | orbit run mysql-cli
+  # |--------------------------------------------------------------------------
+  # |
+  # | Opens the MySQL cli.
+  # | On environments <> "local", it will ask you the MySQL root password.
+  # |
+
+  - use: "mysql-cli"
+    run:
+      - orbit run mysql-cli -c=.docker/.bin/orbit.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env -s

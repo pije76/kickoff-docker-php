@@ -2,3 +2,4 @@ phpmyadmin
 redis
 docker-compose.yml
 docker-compose-proxy.yml
+docker-compose-toolbox.yml

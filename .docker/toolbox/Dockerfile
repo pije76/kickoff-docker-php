@@ -15,6 +15,25 @@ RUN apk update &&\
     rm -rf /var/cache/apk/*
 
 # |--------------------------------------------------------------------------
+# | Edge repositories
+# |--------------------------------------------------------------------------
+# |
+# | TODO
+
+RUN echo http://dl-2.alpinelinux.org/alpine/edge/main/ >> /etc/apk/repositories &&\
+    echo http://dl-2.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories
+
+# |--------------------------------------------------------------------------
+# | OpenSSL
+# |--------------------------------------------------------------------------
+# |
+# | TODO
+
+ENV OPEN_SSL_VERSION 1.0.2l-r0
+
+RUN apk --no-cache add openssl=$OPEN_SSL_VERSION
+
+# |--------------------------------------------------------------------------
 # | Composer
 # |--------------------------------------------------------------------------
 # |
@@ -23,7 +42,8 @@ RUN apk update &&\
 ENV COMPOSER_VERSION 1.1.2
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=$COMPOSER_VERSION &&\
-    chmod +x /usr/local/bin/composer
+    chmod +x /usr/local/bin/composer &&\
+    apk --no-cache add git
 
 # |--------------------------------------------------------------------------
 # | NodeJS
@@ -31,18 +51,17 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # |
 # | TODO
 
-ENV NODE_VERSION 6.11.0
+ENV NODE_VERSION 6.11.0-r0
 
-RUN echo http://dl-2.alpinelinux.org/alpine/edge/main/ >> /etc/apk/repositories &&\
-    echo http://dl-2.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories &&\
-    apk --no-cache add shadow nodejs=$NODE_VERSION-r0 nodejs-npm=$NODE_VERSION-r0 &&\
+RUN apk --no-cache add nodejs=$NODE_VERSION nodejs-npm=$NODE_VERSION &&\
     npm install -g yarn
 
 # |--------------------------------------------------------------------------
-# | Misc
+# | Permissions issues workaround
 # |--------------------------------------------------------------------------
 # |
 # | TODO
 
 ARG UID=1000
-RUN usermod -u $UID www-data;
+RUN apk --no-cache add shadow &&\
+    usermod -u $UID www-data;

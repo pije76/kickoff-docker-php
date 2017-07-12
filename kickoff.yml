@@ -1,67 +1,86 @@
 project:
 
-# |--------------------------------------------------------------------------
-# | Project name
-# |--------------------------------------------------------------------------
-# |
-# | Its the main identifier of your project. It will be used to name your
-# | containers and their networks.
-# |
-# | Container name format: {env}-{project_name}-{service_name}
-# | Network name format: {env}_{project_name}_{service_name}
-# |
-# | The only exception is the traefik (reverse-proxy) container which might
-# | be used for different project / environment.
-# |
+  # |--------------------------------------------------------------------------
+  # | Project name
+  # |--------------------------------------------------------------------------
+  # |
+  # | Its the main identifier of your project. It will be used to name your
+  # | containers and their networks.
+  # |
+  # | Container name format: {env}-{project_name}-{service_name}
+  # | Network name format: {env}_{project_name}_{service_name}
+  # |
+  # | The only exception is the Traefik container which might
+  # | be used for different environment.
+  # |
 
   name: myawesomeproject
 
-# |--------------------------------------------------------------------------
-# | Project base virtual host
-# |--------------------------------------------------------------------------
-# |
-# | The base virtual host of your project according to your environments.
-# |
-# | The following URLs will be available:
-# | - {virtualhost}, www.{virtualhost}: the URLs of your PHP application.
-# | - traefik.{virtualhost}: the URL of the traefik dashboard.
-# | - phpadmin.{virtualhost} : the URL of the phpMyAdmin dashboard.
-# |
-# | The later will only be available on your "local" environment.
-# | Also, don't forget to update your "hosts" file with the previous URLs.
-# | Furthermore, the base virtual host will be used to generate
-# | the self-signed certificates: if you need to update the virtual host,
-# | delete the ".docker/traefik/certs" folder and restarts your containers using
-# | "orbit run down proxy-down proxy-up kickoff".
-# |
+  # |--------------------------------------------------------------------------
+  # | Project base virtual host
+  # |--------------------------------------------------------------------------
+  # |
+  # | The base virtual host of your project according to your environments.
+  # |
+  # | The following URLs will be available:
+  # | - {virtualhost}, www.{virtualhost}: the URLs of your PHP application.
+  # | - traefik.{virtualhost}: the URL of the traefik dashboard.
+  # | - phpadmin.{virtualhost} : the URL of the phpMyAdmin dashboard.
+  # |
+  # | The later will only be available on your "local" environment.
+  # | Also, don't forget to update your "hosts" file with the previous URLs.
+  # |
 
   virtualhost:
     local: my-awesome-project.local
     staging: my-awesome-project.com
     production: my-awesome-project.com
 
-mysql:
+traefik:
 
-# |--------------------------------------------------------------------------
-# | MySQL user
-# |--------------------------------------------------------------------------
-# |
-# | The MySQL user of your PHP application.
-# |
+  # |--------------------------------------------------------------------------
+  # | Traefik user
+  # |--------------------------------------------------------------------------
+  # |
+  # | The Traefik user used for basic auth.
+  # | Only required of environment <> "local".
+  # |
 
   user: kickoff
 
-# |--------------------------------------------------------------------------
-# | MySQL databases
-# |--------------------------------------------------------------------------
-# |
-# | List of the databases of your PHP application. If they do not exist,
-# | they will be created when the MySQL container start.
-# |
-# | The previous user will have all privileges on these databases.
-# |
+mysql:
+
+  # |--------------------------------------------------------------------------
+  # | MySQL user
+  # |--------------------------------------------------------------------------
+  # |
+  # | The MySQL user of your PHP application.
+  # |
+
+  user: kickoff
+
+  # |--------------------------------------------------------------------------
+  # | MySQL databases
+  # |--------------------------------------------------------------------------
+  # |
+  # | List of the databases of your PHP application. If they do not exist,
+  # | they will be created when the MySQL container start.
+  # |
+  # | The previous user will have all privileges on these databases.
+  # |
 
   databases:
     - my_awesome_database
     - my_genious_database
     - my_ok_database
+
+rabbitmq:
+
+  # |--------------------------------------------------------------------------
+  # | RabbitMQ user
+  # |--------------------------------------------------------------------------
+  # |
+  # | The RabbitMQ user of your PHP application.
+  # |
+
+  user: kickoff

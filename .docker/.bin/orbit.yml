@@ -2,20 +2,76 @@
 # | Orbit commands
 # |--------------------------------------------------------------------------
 # |
-# | TODO
+# | This file describes the Orbit commands of your project which needs dynamic
+# | values from your kickoff.yml and .env files.
+# | Feel free to add your own commands!
+# |
+# | https://github.com/gulien/orbit/
+# |
 
 commands:
-  - use: "openssl"
+
+    # |--------------------------------------------------------------------------
+    # | orbit run openssl-self-signed-certificate
+    # |--------------------------------------------------------------------------
+    # |
+    # | Generates the self-signed certificate is current environment is "local".
+    # |
+
+  - use: "openssl-self-signed-certificate"
     run:
     {{- if eq "local" .EnvFiles.Kickoff.ENV }}
-      - orbit generate -t=.docker/.bin/docker-compose-openssl.blueprint.yml -o=.docker/.bin/docker-compose-openssl.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env
-      - docker-compose -f .docker/.bin/docker-compose-openssl.yml run openssl
+      - docker exec --user root -ti {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-toolbox /bin/sh -c /openssl/self-signed-certificate.sh
     {{- else }}
-      - echo Skipping self-signed certificates generation
+      - echo Skipping self-signed certificate generation ...
     {{- end }}
-  - use: "toolbox"
+
+  # |--------------------------------------------------------------------------
+  # | orbit run openssl-htdigest
+  # |--------------------------------------------------------------------------
+  # |
+  # | Generates the .htdigest file which is used to authenticate on the Traefik
+  # | dashboard. Only for environments <> "local".
+  # |
+
+  - use: "openssl-htdigest"
+    run:
+    {{- if ne "local" .EnvFiles.Kickoff.ENV }}
+      - docker exec --user root -ti {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-toolbox /bin/sh -c /openssl/htdigest.sh "user" "hello"
+    {{- else }}
+      - echo Skipping .htdigest generation ...
+    {{- end }}
+
+  # |--------------------------------------------------------------------------
+  # | orbit run toolbox-ash
+  # |--------------------------------------------------------------------------
+  # |
+  # | Connects through ash to the toolbox container.
+  # |
+
+  - use: "toolbox-ash"
     run:
       - docker exec --user www-data -ti {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-toolbox ash
+
+  # |--------------------------------------------------------------------------
+  # | orbit run mysql-cli
+  # |--------------------------------------------------------------------------
+  # |
+  # | Opens the MySQL cli.
+  # | On environments <> "local", it will ask you the MySQL root password.
+  # |
+
   - use: "mysql-cli"
     run:
       - docker exec -ti {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-mysql mysql -uroot -p{{ if eq "local" .EnvFiles.Kickoff.ENV }}{{ .EnvFiles.Kickoff.MYSQL_ROOT_PASSWORD }}{{ end }}
+
+  # |--------------------------------------------------------------------------
+  # | orbit run rkt
+  # |--------------------------------------------------------------------------
+  # |
+  # | Prints a nice rocket to Stdout.
+  # |
+
+  - use: "rkt"
+    run:
+      - orbit generate -t=.docker/.misc/rkt.txt -v=Rkt,.docker/.misc/rkt.yml

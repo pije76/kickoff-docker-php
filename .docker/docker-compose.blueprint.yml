@@ -4,21 +4,6 @@ version: '3.3'
 services:
 
 
-  toolbox:
-    build:
-      context: ./toolbox
-      args:
-        - UID={{ if eq "linux" .Os }}${UID}{{ else }}1000{{ end }}
-    container_name: {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-toolbox
-    restart: unless-stopped
-    tty: true
-    working_dir: /var/www/html
-    labels:
-      - traefik.enable=false
-    volumes:
-      - ../app:/var/www/html:rw
-
-
   nginx:
     build:
       context: ./nginx
@@ -92,8 +77,8 @@ services:
     container_name: {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-phpmyadmin
     restart: unless-stopped
     networks:
-        - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_mysql
-        - proxy
+      - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_mysql
+      - proxy
     environment:
       - PMA_HOST=mysql
       - PMA_USER=root

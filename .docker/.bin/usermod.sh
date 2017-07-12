@@ -9,6 +9,7 @@ sedi()
 }
 
 # permissions issues workaround for Linux
+sedi "s/\${UID}/$(id -u)/g" ${ROOT}/.docker/docker-compose-toolbox.yml;
 sedi "s/\${UID}/$(id -u)/g" ${ROOT}/.docker/docker-compose.yml;
 
 exit 0;
