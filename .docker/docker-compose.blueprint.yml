@@ -36,6 +36,7 @@ services:
       - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_php_fpm
       - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_mysql
       - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_redis
+      - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_rabbitmq
     environment:
       - UID={{ if eq "linux" .Os }}${UID}{{ else }}1000{{ end }}
     labels:
@@ -105,7 +106,31 @@ services:
     labels:
       - traefik.enable=false
     volumes:
-      - ./redis/voume:/data:rw
+      - ./redis/volume:/data:rw
+
+
+  rabbitmq:
+    image: rabbitmq:3.6-management-alpine
+    container_name: {{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-rabbitmq
+    restart: unless-stopped
+    hostname: rabbitmq
+    networks:
+      - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_rabbitmq
+      - proxy
+    environment:
+      - RABBITMQ_DEFAULT_USER={{ .Values.Kickoff.rabbitmq.user }}
+      - RABBITMQ_DEFAULT_PASS={{ .EnvFiles.Kickoff.RABBITMQ_PASSWORD }}
+    labels:
+      - traefik.backend={{ .EnvFiles.Kickoff.ENV }}-{{ .Values.Kickoff.project.name }}-rabbitmq
+      {{- range $env, $virtualhost := .Values.Kickoff.project.virtualhost }}
+      {{- if eq  $env $.EnvFiles.Kickoff.ENV }}
+      - traefik.frontend.rule=Host:rabbitmq.{{ $virtualhost }}
+      {{- end }}
+      {{- end }}
+      - traefik.port=15672
+      - traefik.docker.network=kickoff_proxy
+    volumes:
+      - ./rabbitmq/volume:/var/lib/rabbitmq:rw
 
 
 secrets:
@@ -131,6 +156,10 @@ networks:
 
 
   {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_redis:
+    driver: bridge
+
+
+  {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_rabbitmq:
     driver: bridge
 
 

@@ -11,7 +11,7 @@ RUN apk update &&\
     apk upgrade &&\
     apk add libjpeg libjpeg-turbo libjpeg-turbo-dev libpng libpng-dev freetype freetype-dev libmcrypt libmcrypt-dev &&\
     docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ &&\
-    docker-php-ext-install mcrypt zip gd &&\
+    docker-php-ext-install mcrypt zip gd bcmath mbstring &&\
     docker-php-ext-install opcache &&\
     rm -rf /var/cache/apk/*
 

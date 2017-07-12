@@ -1,4 +1,5 @@
 phpmyadmin
+rabbitmq
 redis
 docker-compose.yml
 docker-compose-proxy.yml

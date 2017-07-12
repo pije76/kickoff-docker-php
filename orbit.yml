@@ -122,7 +122,7 @@ commands:
   # | orbit run up
   # |--------------------------------------------------------------------------
   # |
-  # | Starts the NGINX, PHP-FPM, MySQL and Redis containers.
+  # | Starts the NGINX, PHP-FPM, MySQL, Redis and RabbitMQ containers.
   # | On "local" environment, also starts the phpMyAdmin container.
   # |
   # | Make sure you have start the Traefik container before running it!
@@ -136,7 +136,7 @@ commands:
   # | orbit run down
   # |--------------------------------------------------------------------------
   # |
-  # | Stops the NGINX, PHP-FPM, MySQL and Redis containers.
+  # | Stops the NGINX, PHP-FPM, MySQL, Redis and RabbitMQ containers.
   # | On "local" environment, also stops the phpMyAdmin container.
   # |
 

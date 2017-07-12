@@ -25,6 +25,7 @@ project:
   # | The following URLs will be available:
   # | - {virtualhost}, www.{virtualhost}: the URLs of your PHP application.
   # | - traefik.{virtualhost}: the URL of the traefik dashboard.
+  # | - rabbitmq.{virtualhost}: the URL of the RabbitMQ management.
   # | - phpadmin.{virtualhost} : the URL of the phpMyAdmin dashboard.
   # |
   # | The later will only be available on your "local" environment.
