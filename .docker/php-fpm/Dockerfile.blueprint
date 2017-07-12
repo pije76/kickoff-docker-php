@@ -1,10 +1,11 @@
+FROM php:7.1-fpm-alpine
+
 # |--------------------------------------------------------------------------
-# | PHP-FPM
+# | Main PHP dependencies
 # |--------------------------------------------------------------------------
 # |
-# | TODO
-
-FROM php:7.1-fpm-alpine
+# | Installs the main PHP dependencies
+# |
 
 RUN apk update &&\
     apk upgrade &&\
@@ -19,7 +20,9 @@ RUN apk update &&\
 # | Redis
 # |--------------------------------------------------------------------------
 # |
-# | TODO
+# | Installs the Redis extension for PHP. Also tells PHP to use it as the
+# | session handler.
+# |
 
 ENV PHPREDIS_VERSION 3.1.2
 
@@ -32,13 +35,14 @@ RUN mkdir -p /usr/src/php/ext/redis &&\
         echo 'session.save_path = tcp://redis:6379?auth={{ .EnvFiles.Kickoff.REDIS_PASSWORD }}'; \
     } >> /usr/local/etc/php/conf.d/docker-php-ext-redis.ini
 
+{{ if eq "local" .EnvFiles.Kickoff.ENV }}
 # |--------------------------------------------------------------------------
 # | Xdebug
 # |--------------------------------------------------------------------------
 # |
-# | TODO
+# | Installs Xdebug, a tool for easily debugging your PHP code.
+# |
 
-{{ if eq "local" .EnvFiles.Kickoff.ENV }}
 ENV XDEBUG_VERSION XDEBUG_2_5_5
 
 RUN mkdir -p /usr/src/php/ext/xdebug &&\
@@ -55,10 +59,13 @@ RUN mkdir -p /usr/src/php/ext/xdebug &&\
 {{ end }}
 
 # |--------------------------------------------------------------------------
-# | Misc
+# | Permissions issues workaround
 # |--------------------------------------------------------------------------
 # |
-# | TODO
+# | Installs edge repositories and shadow package to enable usermod command.
+# | On Linux, the entrypoint of this container will set the UID of www-data
+# | with the UID of the current user from the host.
+# |
 
 RUN echo http://dl-2.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories &&\
     apk --no-cache add shadow
