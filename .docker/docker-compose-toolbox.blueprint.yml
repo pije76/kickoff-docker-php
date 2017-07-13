@@ -14,7 +14,7 @@ services:
     tty: true
     working_dir: /var/www/html
     networks:
-      - {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_toolbox
+      - backend
     environment:
       {{- range $env, $virtualhost := .Values.Kickoff.project.virtualhost }}
       {{- if eq  $env $.EnvFiles.Kickoff.ENV }}
@@ -41,5 +41,5 @@ services:
 networks:
 
 
-  {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }}_toolbox:
+  backend:
     driver: bridge

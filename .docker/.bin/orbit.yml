@@ -43,6 +43,28 @@ commands:
     {{- end }}
 
   # |--------------------------------------------------------------------------
+  # | orbit run toolbox-up
+  # |--------------------------------------------------------------------------
+  # |
+  # | Starts the toolbox container.
+  # |
+
+  - use: "toolbox-up"
+    run:
+      - docker-compose -p {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }} -f .docker/docker-compose-toolbox.yml up -d
+
+  # |--------------------------------------------------------------------------
+  # | orbit run toolbox-down
+  # |--------------------------------------------------------------------------
+  # |
+  # | Stops the toolbox container.
+  # |
+
+  - use: "toolbox-down"
+    run:
+      - docker-compose -p {{ .EnvFiles.Kickoff.ENV }}_{{ .Values.Kickoff.project.name }} -f .docker/docker-compose-toolbox.yml down
+
+  # |--------------------------------------------------------------------------
   # | orbit run toolbox-ash
   # |--------------------------------------------------------------------------
   # |

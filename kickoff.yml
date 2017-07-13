@@ -4,14 +4,9 @@ project:
   # | Project name
   # |--------------------------------------------------------------------------
   # |
-  # | Its the main identifier of your project. It will be used to name your
-  # | containers and their networks.
-  # |
-  # | Container name format: {env}-{project_name}-{service_name}
-  # | Network name format: {env}_{project_name}_{service_name}
-  # |
-  # | The only exception is the Traefik container which might
-  # | be used for different environment.
+  # | Its the main identifier of your project. It will be used to name many
+  # | variables which will be useful to help identifying your project among
+  # | others Docker projects.
   # |
 
   name: myawesomeproject
@@ -43,7 +38,7 @@ traefik:
   # | Traefik user
   # |--------------------------------------------------------------------------
   # |
-  # | The Traefik user used for basic auth.
+  # | The Traefik user used for generating the .htdigest file.
   # | Only required of environment <> "local".
   # |
 

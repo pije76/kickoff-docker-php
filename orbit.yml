@@ -14,11 +14,13 @@ commands:
   # | orbit run toolbox-build
   # |--------------------------------------------------------------------------
   # |
-  # | Generates the toolbox docker-compose file and builds the toolbox container.
+  # | Generates all configuration files plus the toolbox docker-compose file
+  # | and builds the toolbox container.
   # |
 
   - use: "toolbox-build"
     run:
+      - orbit generate -t=.docker/toolbox/Dockerfile.blueprint -o=.docker/toolbox/Dockerfile -v=Kickoff,kickoff.yml -e=Kickoff,.env
       - orbit generate -t=.docker/docker-compose-toolbox.blueprint.yml -o=.docker/docker-compose-toolbox.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env
       {{- if eq "linux" .Os }}
       - sh .docker/.bin/usermod.sh
@@ -31,11 +33,13 @@ commands:
   # |
   # | Starts the tooblox container.
   # | On "local" environment, also generates the self-signed certificate.
+  # | On environment <> "local", generates an .htdigest file for authentication
+  # | on the Traefik dashboard.
   # |
 
   - use: "toolbox-up"
     run:
-      - docker-compose -f .docker/docker-compose-toolbox.yml up -d
+      - orbit run toolbox-up -c=.docker/.bin/orbit.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env -s
       - orbit run openssl-self-signed-certificate -c=.docker/.bin/orbit.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env -s
       - orbit run openssl-htdigest -c=.docker/.bin/orbit.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env -s
 
@@ -48,7 +52,7 @@ commands:
 
   - use: "toolbox-down"
     run:
-      - docker-compose -f .docker/docker-compose-toolbox.yml down
+      - orbit run toolbox-down -c=.docker/.bin/orbit.yml -v=Kickoff,kickoff.yml -e=Kickoff,.env -s
 
   # |--------------------------------------------------------------------------
   # | orbit run toolbox
