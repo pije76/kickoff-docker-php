@@ -19,12 +19,12 @@
 
 ## Features
 
-* **Cross-platform:** Windows, Mac, Linux.
+* **Cross-platform:** Windows, Mac, Linux
 * **Customizable** thanks to [Orbit](https://github.com/gulien/orbit).
-* **A complete stack:** NGINX, PHP-FPM 7.1, MySQL 5.7, phpMyAdmin, Redis, RabbitMQ and more!
-* Automatic **HTTPS** generation on your local environment!
+* **A complete stack:** NGINX, PHP-FPM 7.1, MySQL 5.7, phpMyAdmin, Redis, RabbitMQ and more
+* Automatic **HTTPS** generation on your local environment
 * A powerful **reverse-proy** ([Traefik](https://traefik.io/)) which can handle automatic HTTPS (via [Let's Encrypt](https://letsencrypt.org/))
-on your production environment.
+on your production environment
 
 And more to come! :smiley:
 
@@ -32,9 +32,39 @@ And more to come! :smiley:
 
 ## Quick start
 
+First, fork this project and clone it.
+
+Once done, move to the root directory of this project and copy the file `.env.blueprint` and paste it to a file
+named `.env`.
+
+Now open your hosts file and add the following lines at the end of the file:
+
+```
+127.0.0.1   my-awesome-project.local
+127.0.0.1   www.my-awesome-project.local
+127.0.0.1   traefik.my-awesome-project.local
+127.0.0.1   phpadmin.my-awesome-project.local
+127.0.0.1   rabbitmq.my-awesome-project.local
+```
+ 
+Good :smiley:? We're now done with the configuration! :metal:
+
+Last but not least, **shutdown your local Apache or anything which could use your 80 and 443 ports**, and run:
+
+```
+orbit run kickoff
+```
+
+The installation might take some time, so go for a coffee break! :coffee: 
+
+Once everything has been installed, open your favorite web browser and copy / paste https://www.my-awesome-project.local 
+and check if everything is OK!
+
 ## Credits
 
-
+* NGINX and PHP-FPM configuration files from [Cerenit](https://code.cerenit.fr/cerenit/docker-grav)
+* MySQL utf8mb4 encoding from [this blog article](https://mathiasbynens.be/notes/mysql-utf8mb4)
+* Icon by Nikita Kozin from the Noun Project
 
 ---
 
