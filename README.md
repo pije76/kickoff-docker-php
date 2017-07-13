@@ -30,11 +30,20 @@ And more to come! :smiley:
 
 ## Install
 
+Downloads and installs [Docker](https://docs.docker.com/engine/installation/)(>= 17.06) for your platform.
+
+On Linux, you also have to install [Docker compose](https://docs.docker.com/compose/install/) (>= 1.14.0) as it does not
+come with by default. Also add your current user to the `docker` group and don't forget to logout/login from your current 
+session.
+
+Then downloads and installs [Orbit](https://github.com/gulien/orbit), a tool for generating files from templates and 
+running commands.
+
+You may now fork this project and clone it or download the latest release from the [releases page](../../releases).
+
 ## Quick start
 
-First, fork this project and clone it.
-
-Once done, move to the root directory of this project and copy the file `.env.blueprint` and paste it to a file
+Once you've downloaded this project, move to the root directory of this project and copy the file `.env.blueprint` and paste it to a file
 named `.env`.
 
 Now open your hosts file and add the following lines at the end of the file:
